@@ -1,5 +1,3 @@
-print("Build client starts")
-
 local color_white = Color(255, 255, 255, 255)
 
 local drawLabel = false 
@@ -8,30 +6,20 @@ local icon = Material("icon16/wrench.png")
 
 local localPlayer = LocalPlayer()
 
-net.Receive("build_activate", function (len, ply)
-    drawLabel = true 
-
-    print("You are in build mode!")
-end)
-
-net.Receive("build_disable", function (len, ply)
-    drawLabel = false 
-
-    print("You are disable build mode!")
-end)
-
-hook.Add("HUDPaint", "BuildHUDPaint", function ()    
-    if localPlayer then
-        localPlayer = LocalPlayer()
-    end
-    
-    if drawLabel then
-        draw.DrawText("Ти у режимі будівника!", "DermaLarge", ScrW() / 2, ScrH() - 50, color_white, TEXT_ALIGN_CENTER)
+net.Receive("build_send", function (len, ply)
+    if net.ReadBool() then
+        hook.Add("HUDPaint", "BuildHUDPaint", function ()    
+            draw.DrawText("Ти у режимі будівельника!", "DermaLarge", ScrW() / 2, ScrH() - 50, color_white, TEXT_ALIGN_CENTER)
+        end)
+    else
+        hook.Remove("HUDPaint", "BuildHUDPaint")
     end
 end)
 
 hook.Add("PostDrawOpaqueRenderables", "DrawPanels3DUA", function ()
     if not localPlayer then
+        localPlayer = LocalPlayer()
+        
         return
     end
     
@@ -49,7 +37,7 @@ hook.Add("PostDrawOpaqueRenderables", "DrawPanels3DUA", function ()
             localPlayer:EyeAngles().z
         )
 
-        cam.Start3D2D(pos + Vector(0, 0, 25), angle + Angle(0, -90, 90), 0.5)
+        cam.Start3D2D(pos + Vector(0, 0, 50), angle + Angle(0, -90, 90), 1)
             local pad = 5
 
             surface.SetDrawColor(255, 255, 255)
